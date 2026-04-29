@@ -1,59 +1,31 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, createContext, useContext } from 'react'
+import { Routes, Route, NavLink } from 'react-router-dom'
+import type { Task, ChatMessage, AgentName } from './types'
+import { agents, defaultTasks, defaultChat, getAgent } from './data'
+import DashboardPage from './pages/DashboardPage'
+import ChatPage from './pages/ChatPage'
+import TaskModal from './components/TaskModal'
+import NotesPage from './pages/NotesPage'
+import WhisperChat from './pages/WhisperChat'
+import LandingPage from './pages/LandingPage'
+import AffiliatePage from './pages/AffiliatePage'
 
-// ========== TYPES ==========
-interface Task {
-  id: string
-  title: string
-  status: 'plan' | 'progress' | 'review' | 'done'
-  badge: string
-  badgeType: 'idea' | 'dev' | 'done'
-  assignee: string
-  date: string
+// ========== CONTEXT ==========
+interface AppContextType {
+  tasks: Task[]
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>
+  chatMessages: ChatMessage[]
+  addChat: (msg: ChatMessage) => void
+  selectedTask: Task | null
+  setSelectedTask: (t: Task | null) => void
 }
 
-interface PlatformData {
-  name: string
-  icon: string
-  color: string
-  followers: number
-  views: number
-  posts: number
-  change: number
+const AppContext = createContext<AppContextType>(null!)
+
+export function useApp() {
+  return useContext(AppContext)
 }
 
-interface CostData {
-  month: string
-  value: number
-}
-
-// ========== SAMPLE DATA ==========
-const tasks: Task[] = [
-  { id: '1', title: 'Webapp brand átírás', status: 'plan', badge: 'Design', badgeType: 'idea', assignee: 'Clawdius', date: 'Ápr 28' },
-  { id: '2', title: 'Research elemzés', status: 'plan', badge: 'Research', badgeType: 'idea', assignee: 'Clawdius', date: 'Ápr 27' },
-  { id: '3', title: 'Zapier login', status: 'plan', badge: 'DevOps', badgeType: 'dev', assignee: 'Balázs', date: 'Ápr 28' },
-  { id: '4', title: 'Clawdius Contentus beállítás', status: 'progress', badge: 'Dev', badgeType: 'dev', assignee: 'Clawdius', date: 'Ápr 27' },
-  { id: '5', title: 'Dashboard deploy', status: 'progress', badge: 'Dev', badgeType: 'dev', assignee: 'Clawdius', date: 'Ápr 27' },
-  { id: '6', title: 'DNS konfiguráció', status: 'done', badge: 'Infra', badgeType: 'done', assignee: 'Balázs', date: 'Ápr 27' },
-  { id: '7', title: 'GitHub SSH setup', status: 'done', badge: 'Infra', badgeType: 'done', assignee: 'Balázs', date: 'Ápr 27' },
-  { id: '8', title: 'Morning Spark cron', status: 'done', badge: 'System', badgeType: 'done', assignee: 'Clawdius', date: 'Ápr 27' },
-]
-
-const platforms: PlatformData[] = [
-  { name: 'LinkedIn', icon: '💼', color: '#0a66c2', followers: 12, views: 340, posts: 2, change: 12 },
-  { name: 'Facebook', icon: '📘', color: '#1877f2', followers: 8, views: 180, posts: 1, change: 8 },
-  { name: 'Instagram', icon: '📸', color: '#e4405f', followers: 5, views: 290, posts: 1, change: 5 },
-  { name: 'TikTok', icon: '🎵', color: '#000000', followers: 0, views: 0, posts: 0, change: 0 },
-  { name: 'YouTube', icon: '▶️', color: '#ff0000', followers: 3, views: 65, posts: 0, change: 3 },
-  { name: 'X/Twitter', icon: '🐦', color: '#1da1f2', followers: 2, views: 45, posts: 0, change: 2 },
-]
-
-const costHistory: CostData[] = [
-  { month: 'Jan', value: 0 }, { month: 'Feb', value: 0 },
-  { month: 'Már', value: 0 }, { month: 'Ápr', value: 1.2 },
-  { month: 'Máj', value: 0 }, { month: 'Jún', value: 0 },
-]
-
-// ========== COMPONENTS ==========
 function Header() {
   const [time, setTime] = useState(new Date())
   useEffect(() => {
@@ -65,9 +37,18 @@ function Header() {
     <header className="header">
       <div className="header-left">
         <div className="logo">C</div>
-        <div className="header-title">
-          <span>Clawdius</span> Command Center
-        </div>
+        <div className="header-title"><span>Clawdius</span> Command Center</div>
+        <nav className="nav-links">
+          <NavLink to="/" end className="nav-link">Dashboard</NavLink>
+          <NavLink to="/tasks" className="nav-link">Feladatok</NavLink>
+          <NavLink to="/my-tasks" className="nav-link">Saját</NavLink>
+          <NavLink to="/notes" className="nav-link">Jegyzetek</NavLink>
+          <NavLink to="/whisper" className="nav-link">🎤 Whisper</NavLink>
+          <NavLink to="/landing" className="nav-link">🏠 Landing</NavLink>
+          <NavLink to="/chat" className="nav-link">Chat</NavLink>
+          <NavLink to="/analytics" className="nav-link">Analitika</NavLink>
+          <NavLink to="/affiliate" className="nav-link">📢 Affiliate</NavLink>
+        </nav>
       </div>
       <div className="header-time">
         {time.toLocaleDateString('hu-HU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
@@ -78,113 +59,66 @@ function Header() {
   )
 }
 
-function StatCard({ label, value, change, icon }: { label: string; value: string; change?: string; icon: string }) {
+function AgentBadge({ name }: { name: AgentName }) {
+  const agent = getAgent(name)
   return (
-    <div className="stat-card">
-      <div className="stat-label">{icon} {label}</div>
-      <div className="stat-value">{value}</div>
-      {change && <div className={`stat-change ${change.startsWith('+') ? 'up' : 'down'}`}>{change}</div>}
-    </div>
+    <span className="agent-badge" style={{ borderColor: agent.color, color: agent.color }}>
+      <span className="agent-badge-icon">{agent.icon}</span>
+      {agent.name}
+    </span>
   )
 }
 
-function CostChart() {
-  const max = Math.max(...costHistory.map(c => c.value), 0.01)
-  return (
-    <div className="chart-card">
-      <div className="chart-title">💰 API Költség (EUR)</div>
-      <div className="bar-chart">
-        {costHistory.map(c => (
-          <div key={c.month} className="bar-container">
-            <div
-              className="bar"
-              style={{
-                height: `${(c.value / max) * 100}%`,
-                background: `var(--brand)`,
-              }}
-            >
-              <div className="bar-tooltip">€{c.value.toFixed(2)}</div>
-            </div>
-            <div className="bar-label">{c.month}</div>
-          </div>
-        ))}
-      </div>
-      <div style={{ marginTop: 16, display: 'flex', gap: 20, justifyContent: 'center', fontSize: 13, color: 'var(--text-dim)' }}>
-        <span>Havi: <strong style={{ color: 'var(--text)' }}>€1.20</strong></span>
-        <span>Éves: <strong style={{ color: 'var(--text)' }}>€~3.60</strong></span>
-        <span>Összes: <strong style={{ color: 'var(--brand)' }}>€1.20</strong></span>
-      </div>
-    </div>
-  )
-}
+// ========== PAGES ==========
+function TasksPage() {
+  const { tasks, setSelectedTask } = useApp()
+  const [filter, setFilter] = useState<AgentName | 'all'>('all')
+  const filtered = filter === 'all' ? tasks : tasks.filter(t => t.assignee === filter)
 
-function PlatformStats() {
-  return (
-    <div className="chart-card">
-      <div className="chart-title">📊 Követők változása (heti)</div>
-      <div className="bar-chart" style={{ height: 80 }}>
-        {platforms.map(p => (
-          <div key={p.name} className="bar-container">
-            <div
-              className="bar"
-              style={{
-                height: `${Math.max((p.change / Math.max(...platforms.map(x => x.change), 1)) * 100, 5)}%`,
-                background: p.color,
-              }}
-            >
-              <div className="bar-tooltip">+{p.change}</div>
-            </div>
-            <div className="bar-label">{p.name.slice(0, 3)}</div>
-          </div>
-        ))}
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: 8 }}>
-        {platforms.map(p => (
-          <div key={p.name} style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-dim)' }}>
-            <div style={{ fontWeight: 600, color: 'var(--text)', fontSize: 13 }}>{p.followers}</div>
-            <div>{p.name}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function KanbanBoard() {
   const columns = [
-    { key: 'plan', label: '📋 Tervezett', dot: 'var(--purple)' },
-    { key: 'progress', label: '⚡ Folyamatban', dot: 'var(--brand)' },
-    { key: 'review', label: '🔍 Ellenőrzés', dot: 'var(--yellow)' },
-    { key: 'done', label: '✅ Kész', dot: 'var(--green)' },
-  ] as const
+    { key: 'plan' as const, label: '📋 Tervezett', dot: 'var(--purple)' },
+    { key: 'progress' as const, label: '⚡ Folyamatban', dot: 'var(--brand)' },
+    { key: 'review' as const, label: '🔍 Ellenőrzés', dot: 'var(--yellow)' },
+    { key: 'done' as const, label: '✅ Kész', dot: 'var(--green)' },
+  ]
 
   return (
     <section className="kanban-section">
       <div className="section-header">
         <div className="section-title">Feladatok <span>· {tasks.filter(t => t.status !== 'done').length} aktív · {tasks.length} összes</span></div>
       </div>
+      <div className="agent-filter-bar">
+        <span className="agent-filter-label">Szűrés:</span>
+        <button className={`agent-filter-btn ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>🤖 Összes</button>
+        {agents.map(a => (
+          <button key={a.name} className={`agent-filter-btn ${filter === a.name ? 'active' : ''}`}
+            style={filter === a.name ? { borderColor: a.color, color: a.color, background: `${a.color}10` } : {}}
+            onClick={() => setFilter(a.name)}>{a.icon} {a.name}</button>
+        ))}
+      </div>
       <div className="kanban">
         {columns.map(col => {
-          const colTasks = tasks.filter(t => t.status === col.key)
+          const colTasks = filtered.filter(t => t.status === col.key)
           return (
             <div key={col.key} className="kanban-column">
               <div className="kanban-header">
-                <div className="kanban-title">
-                  <span className="kanban-dot" style={{ background: col.dot }} />
-                  {col.label}
-                </div>
+                <div className="kanban-title"><span className="kanban-dot" style={{ background: col.dot }} />{col.label}</div>
                 <span className="kanban-count">{colTasks.length}</span>
               </div>
               {colTasks.length === 0 ? (
                 <div className="empty-column">Nincs feladat</div>
               ) : (
                 colTasks.map(t => (
-                  <div key={t.id} className="kanban-card">
-                    <div className="kanban-card-title">{t.title}</div>
+                  <div key={t.id} className="kanban-card" onClick={() => setSelectedTask(t)}>
+                    <div className="kanban-card-header">
+                      <div className="kanban-card-title">{t.title}</div>
+                      <span className={`priority-dot ${t.priority}`} />
+                    </div>
                     <div className="kanban-card-meta">
                       <span className={`kanban-card-badge ${t.badgeType}`}>{t.badge}</span>
-                      <span>{t.assignee} · {t.date}</span>
+                      <AgentBadge name={t.assignee} />
                     </div>
+                    <div className="kanban-card-date">{t.date}{t.comments.length > 0 ? ` · 💬${t.comments.length}` : ''}</div>
                   </div>
                 ))
               )}
@@ -196,69 +130,131 @@ function KanbanBoard() {
   )
 }
 
-function PlatformDetailCard({ p }: { p: PlatformData }) {
+function MyTasksPage() {
+  const { tasks, setSelectedTask } = useApp()
+  const myTasks = tasks.filter(t => t.assignee === 'Balázs' && t.status !== 'done')
+
   return (
-    <div className="platform-card">
-      <div className="platform-header">
-        <div className="platform-icon" style={{ background: `${p.color}20` }}>{p.icon}</div>
-        <div className="platform-name">{p.name}</div>
+    <section id="my-tasks" style={{ marginBottom: 24 }}>
+      <div className="section-header">
+        <div className="section-title">👑 Az én feladataim <span>· {myTasks.length} még elvégzendő</span></div>
       </div>
-      <div className="platform-stats">
-        <div className="platform-stat">
-          <div className="platform-stat-value">{p.followers}</div>
-          <div className="platform-stat-label">Követők</div>
+      {myTasks.length === 0 ? (
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 40, textAlign: 'center', color: 'var(--text-dim)' }}>🎉 Nincs elvégzendő feladatod!</div>
+      ) : (
+        <div className="my-tasks-list">
+          {myTasks.map(t => (
+            <div key={t.id} className="my-task-card" onClick={() => setSelectedTask(t)}>
+              <div className="my-task-left">
+                <span className={`priority-dot ${t.priority}`} style={{ width: 10, height: 10 }} />
+                <div>
+                  <div className="my-task-title">{t.title}</div>
+                  <div className="my-task-desc">{t.description.slice(0, 100)}{t.description.length > 100 ? '...' : ''}</div>
+                </div>
+              </div>
+              <div className="my-task-right">
+                <span className={`status-badge ${t.status}`}>{t.status === 'plan' ? 'Tervezett' : t.status === 'progress' ? 'Folyamatban' : 'Ellenőrzés'}</span>
+                <span className="my-task-date">📅 {t.date}</span>
+                {t.comments.length > 0 && <span className="my-task-date">💬{t.comments.length}</span>}
+                <AgentBadge name={t.assignee} />
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="platform-stat">
-          <div className="platform-stat-value">{p.views}</div>
-          <div className="platform-stat-label">Megtekintés</div>
-        </div>
-        <div className="platform-stat">
-          <div className="platform-stat-value">{p.posts}</div>
-          <div className="platform-stat-label">Posztok</div>
-        </div>
+      )}
+    </section>
+  )
+}
+
+function AnalyticsPage() {
+  const platforms = [
+    { name: 'LinkedIn', icon: '💼', color: '#0a66c2', followers: 12, views: 340, posts: 2, engagement: 4.2 },
+    { name: 'Facebook', icon: '📘', color: '#1877f2', followers: 8, views: 180, posts: 1, engagement: 2.1 },
+    { name: 'Instagram', icon: '📸', color: '#e4405f', followers: 5, views: 290, posts: 1, engagement: 3.8 },
+    { name: 'TikTok', icon: '🎵', color: '#000', followers: 0, views: 0, posts: 0, engagement: 0 },
+    { name: 'YouTube', icon: '▶️', color: '#ff0000', followers: 3, views: 65, posts: 0, engagement: 1.5 },
+    { name: 'X/Twitter', icon: '🐦', color: '#1da1f2', followers: 2, views: 45, posts: 0, engagement: 0.8 },
+  ]
+
+  const rows = [platforms.slice(0, 3), platforms.slice(3)]
+
+  return (
+    <section>
+      <div className="section-header" style={{ marginBottom: 16 }}>
+        <div className="section-title">📊 Közösségi analitika</div>
       </div>
-      <div className="platform-bar">
-        <div className="platform-bar-fill" style={{ width: `${Math.min(p.views / 5, 100)}%`, background: p.color }} />
-      </div>
-    </div>
+      {rows.map((row, i) => (
+        <div key={i} className="platforms-row">
+          {row.map(p => {
+            const maxVal = Math.max(p.views, p.followers * 10)
+            return (
+              <div key={p.name} className="platform-card">
+                <div className="platform-header">
+                  <div className="platform-icon" style={{ background: `${p.color}20` }}>{p.icon}</div>
+                  <div className="platform-name">{p.name}</div>
+                </div>
+                <div className="platform-stats">
+                  <div className="platform-stat"><div className="platform-stat-value">{p.followers}</div><div className="platform-stat-label">Követők</div></div>
+                  <div className="platform-stat"><div className="platform-stat-value">{p.views}</div><div className="platform-stat-label">Megtekintés</div></div>
+                  <div className="platform-stat"><div className="platform-stat-value">{p.posts}</div><div className="platform-stat-label">Posztok</div></div>
+                </div>
+                <div className="platform-bar"><div className="platform-bar-fill" style={{ width: `${Math.min(maxVal / 10, 100)}%`, background: p.color }} /></div>
+                <div style={{ textAlign: 'center', marginTop: 8, fontSize: 12, color: 'var(--text-dim)' }}>Elköteleződés: <strong style={{ color: 'var(--text)' }}>{p.engagement}%</strong></div>
+              </div>
+            )
+          })}
+        </div>
+      ))}
+    </section>
   )
 }
 
 // ========== MAIN APP ==========
 export default function App() {
+  const [tasks, setTasks] = useState<Task[]>(defaultTasks)
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(defaultChat)
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+
+  function handleAddComment(taskId: string, text: string) {
+    const now = new Date().toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' })
+    setTasks(prev => prev.map(t => {
+      if (t.id !== taskId) return t
+      return {
+        ...t,
+        comments: [...t.comments, {
+          id: `cmt${Date.now()}`,
+          author: 'Balázs' as AgentName,
+          text,
+          time: now,
+        }]
+      }
+    }))
+  }
+
+  function addChat(msg: ChatMessage) {
+    setChatMessages(prev => [...prev, msg])
+  }
+
   return (
-    <div className="dashboard">
-      <Header />
-      
-      <div className="stats-grid">
-        <StatCard icon="💰" label="API költség (ma)" value="€0.04" change="+€0.04" />
-        <StatCard icon="📋" label="Aktív feladatok" value={`${tasks.filter(t => t.status !== 'done').length}`} />
-        <StatCard icon="✅" label="Kész ma" value="3" change="+3" />
-        <StatCard icon="📈" label="Össz. követő" value={`${platforms.reduce((s, p) => s + p.followers, 0)}`} change="+30" />
+    <AppContext.Provider value={{ tasks, setTasks, chatMessages, addChat, selectedTask, setSelectedTask }}>
+      <div className="dashboard">
+        <Header />
+        <Routes>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/tasks" element={<TasksPage />} />
+          <Route path="/my-tasks" element={<MyTasksPage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/notes" element={<NotesPage />} />
+        <Route path="/whisper" element={<WhisperChat />} />
+        <Route path="/landing" element={<LandingPage />} />
+        <Route path="/affiliate" element={<AffiliatePage />} />
+  </Routes>
+
+        {selectedTask && (
+          <TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} onAddComment={handleAddComment} />
+        )}
       </div>
-
-      <div className="charts-row">
-        <CostChart />
-        <PlatformStats />
-      </div>
-
-      <KanbanBoard />
-
-      <section>
-        <div className="section-header" style={{ marginBottom: 16 }}>
-          <div className="section-title">Közösségi platformok</div>
-        </div>
-        <div className="platforms-row">
-          {platforms.slice(0, 4).map(p => (
-            <PlatformDetailCard key={p.name} p={p} />
-          ))}
-        </div>
-        <div className="platforms-row">
-          {platforms.slice(4).map(p => (
-            <PlatformDetailCard key={p.name} p={p} />
-          ))}
-        </div>
-      </section>
-    </div>
+    </AppContext.Provider>
   )
 }
