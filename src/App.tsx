@@ -9,6 +9,9 @@ import NotesPage from './pages/NotesPage'
 import WhisperChat from './pages/WhisperChat'
 import LandingPage from './pages/LandingPage'
 import AffiliatePage from './pages/AffiliatePage'
+import ResourcesPage from './pages/ResourcesPage'
+import AssistensPage from './pages/AssistensPage'
+import { SettingsPage } from './pages/SettingsPage'
 
 // ========== CONTEXT ==========
 interface AppContextType {
@@ -39,15 +42,18 @@ function Header() {
         <div className="logo">C</div>
         <div className="header-title"><span>Clawdius</span> Command Center</div>
         <nav className="nav-links">
-          <NavLink to="/" end className="nav-link">Dashboard</NavLink>
-          <NavLink to="/tasks" className="nav-link">Feladatok</NavLink>
-          <NavLink to="/my-tasks" className="nav-link">Saját</NavLink>
-          <NavLink to="/notes" className="nav-link">Jegyzetek</NavLink>
+          <NavLink to="/" end className="nav-link">📊 Dashboard</NavLink>
+          <NavLink to="/tasks" className="nav-link">📌 Task-ok</NavLink>
+          <NavLink to="/my-tasks" className="nav-link">👑 Saját</NavLink>
           <NavLink to="/whisper" className="nav-link">🎤 Whisper</NavLink>
-          <NavLink to="/landing" className="nav-link">🏠 Landing</NavLink>
-          <NavLink to="/chat" className="nav-link">Chat</NavLink>
-          <NavLink to="/analytics" className="nav-link">Analitika</NavLink>
+          <NavLink to="/notes" className="nav-link">📋 Notes</NavLink>
+          <NavLink to="/chat" className="nav-link">💬 Chat</NavLink>
+          <NavLink to="/analytics" className="nav-link">📊 Analytics</NavLink>
           <NavLink to="/affiliate" className="nav-link">📢 Affiliate</NavLink>
+          <NavLink to="/landing" className="nav-link">🌐 Landing</NavLink>
+          <NavLink to="/resources" className="nav-link">🔗 Linktár</NavLink>
+          <NavLink to="/assistant" className="nav-link">👩 Assistens</NavLink>
+          <NavLink to="/settings" className="nav-link">⚙️ Settings</NavLink>
         </nav>
       </div>
       <div className="header-time">
@@ -245,11 +251,14 @@ export default function App() {
           <Route path="/my-tasks" element={<MyTasksPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
-              <Route path="/notes" element={<NotesPage />} />
-        <Route path="/whisper" element={<WhisperChat />} />
-        <Route path="/landing" element={<LandingPage />} />
-        <Route path="/affiliate" element={<AffiliatePage />} />
-  </Routes>
+          <Route path="/notes" element={<NotesPage />} />
+          <Route path="/whisper" element={<WhisperChat />} />
+          <Route path="/landing" element={<LandingPage />} />
+          <Route path="/affiliate" element={<AffiliatePage />} />
+          <Route path="/resources" element={<ResourcesPage />} />
+          <Route path="/assistant" element={<AssistensPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Routes>
 
         {selectedTask && (
           <TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} onAddComment={handleAddComment} />

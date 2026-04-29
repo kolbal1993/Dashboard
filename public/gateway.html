@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Gateway - Clawdius</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #0a0a1a; 
+            font-family: 'Inter', system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .topbar {
+            background: #111;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid #222;
+        }
+        .topbar h2 { color: #e63946; font-size: 16px; font-weight: 600; }
+        .topbar a { color: #666; text-decoration: none; font-size: 13px; }
+        .topbar a:hover { color: #e63946; }
+        iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: white;
+        }
+        .note {
+            background: #1a1a2e;
+            color: #aaa;
+            padding: 8px 24px;
+            font-size: 12px;
+            text-align: center;
+            border-top: 1px solid #222;
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <h2>🦞 Clawdius Command</h2>
+        <a href="/">← Dashboard</a>
+    </div>
+    <iframe src="https://openclaw-gateway-proxy.kolbal1993.workers.dev/"></iframe>
+    <div class="note">OpenClaw Gateway — csak olvasott módban elérhető</div>
+</body>
+</html>
