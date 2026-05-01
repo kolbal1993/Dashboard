@@ -17,7 +17,7 @@ const Theme = createContext<ThemeState>(null!)
 export function useApp() { return useContext(Theme) }
 
 // ====== API HELPERS ======
-const API_BASE = 'https://clawdius.mindennapai.eu/dashboard-api'
+const API_BASE = ''
 
 async function fetchCost(): Promise<{today: string, month: string}> {
   try {
@@ -36,12 +36,9 @@ async function fetchHealthLog(): Promise<any[]> {
 
 async function fetchN8nWorkflows(): Promise<number> {
   try {
-    const r = await fetch('https://n8n.mindennapai.eu/api/v1/workflows?active=true&limit=50', {
-      signal: AbortSignal.timeout(3000),
-      headers: { 'X-N8N-API-KEY': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NTY3MDQ3OS1kNjU2LTRhNWYtYjZmMi04OWUxZmY1NDg5MDYiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiMGQwNmFjNWMtNWQ1Zi00YTNhLWI1MzctYjdlMzVlYmE3YzhlIiwiaWF0IjoxNzc3NjE4NDQxfQ.BRwcWD_JEmQCxepPyZ6Ffz2JqPhmThEZ95iNQ1fyJMU' }
-    })
+    const r = await fetch('/api/n8n/workflows', { signal: AbortSignal.timeout(3000) })
     const d = await r.json()
-    return d.data?.length || 0
+    return d.count || 0
   } catch { return 0 }
 }
 
@@ -61,12 +58,9 @@ async function fetchAgentStatuses(): Promise<any> {
 
 async function fetchN8nFailed(): Promise<number> {
   try {
-    const r = await fetch('https://n8n.mindennapai.eu/api/v1/executions?status=error&limit=50', {
-      signal: AbortSignal.timeout(3000),
-      headers: { 'X-N8N-API-KEY': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NTY3MDQ3OS1kNjU2LTRhNWYtYjZmMi04OWUxZmY1NDg5MDYiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiMGQwNmFjNWMtNWQ1Zi00YTNhLWI1MzctYjdlMzVlYmE3YzhlIiwiaWF0IjoxNzc3NjE4NDQxfQ.BRwcWD_JEmQCxepPyZ6Ffz2JqPhmThEZ95iNQ1fyJMU' }
-    })
+    const r = await fetch('/api/n8n/executions', { signal: AbortSignal.timeout(3000) })
     const d = await r.json()
-    return d.data?.length || 0
+    return d.count || 0
   } catch { return 0 }
 }
 
