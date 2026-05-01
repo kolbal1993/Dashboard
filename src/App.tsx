@@ -17,7 +17,7 @@ const Theme = createContext<ThemeState>(null!)
 export function useApp() { return useContext(Theme) }
 
 // ====== API HELPERS ======
-const API_BASE = 'http://168.231.105.140:3002'
+const API_BASE = 'https://clawdius.mindennapai.eu/dashboard-api'
 
 async function fetchCost(): Promise<{today: string, month: string}> {
   try {
