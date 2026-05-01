@@ -3,6 +3,7 @@
 // v2 — forwards POST/PATCH/DELETE bodies with Content-Type + Auth headers
 
 const VPS_HTTP = 'http://168.231.105.140:3000'
+const SETTINGS_DIRECT = 'http://168.231.105.140:3010'
 const N8N_API = 'https://n8n.mindennapai.eu/api/v1'
 const N8N_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NTY3MDQ3OS1kNjU2LTRhNWYtYjZmMi04OWUxZmY1NDg5MDYiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiMGQwNmFjNWMtNWQ1Zi00YTNhLWI1MzctYjdlMzVlYmE3YzhlIiwiaWF0IjoxNzc3NjE4NDQxfQ.BRwcWD_JEmQCxepPyZ6Ffz2JqPhmThEZ95iNQ1fyJMU'
 
@@ -24,9 +25,9 @@ export default async function handler(req, res) {
     // ─── Settings API → VPS port 3000 → Hostinger proxy → port 3001 ───
     if (pathname.startsWith('/api/settings/')) {
       const targetPath = pathname.replace(/^\/api\/settings/, '')
-      const url = `${VPS_HTTP}/api/settings${targetPath}${search}`
+      // Use the direct proxy (port 3010) to avoid Hostinger proxy body-consumption issue
+      const url = `${SETTINGS_DIRECT}/api/settings${targetPath}${search}`
 
-      // Build upstream fetch options with body forwarding
       const fetchOpts = { method: req.method, headers: {} }
 
       // Forward Content-Type and Authorization for write operations
