@@ -1,11 +1,13 @@
 // Vercel serverless API proxy — routes through VPS port 3000 (only external port)
 // Server-side: no CORS/SSL issues from Vercel to VPS
 // v2 — forwards POST/PATCH/DELETE bodies with Content-Type + Auth headers
-
-const VPS_HTTP = 'http://168.231.105.140:3000'
+// VPS HTTP proxy target (Hetzner) — self-signed cert, uses custom agent
+import https from 'https'
+const VPS_AGENT = new https.Agent({ rejectUnauthorized: false })
+const VPS_HTTP = 'https://89.167.74.30:8445'
 // Port 3000 = Hostinger proxy (now fixed to forward POST body)
 const N8N_API = 'https://n8n.mindennapai.eu/api/v1'
-const N8N_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NTY3MDQ3OS1kNjU2LTRhNWYtYjZmMi04OWUxZmY1NDg5MDYiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiMGQwNmFjNWMtNWQ1Zi00YTNhLWI1MzctYjdlMzVlYmE3YzhlIiwiaWF0IjoxNzc3NjE4NDQxfQ.BRwcWD_JEmQCxepPyZ6Ffz2JqPhmThEZ95iNQ1fyJMU'
+const N8N_KEY = process.env.N8N_API_KEY || ''
 
 export const config = {
   api: {
@@ -27,7 +29,7 @@ export default async function handler(req, res) {
       const targetPath = pathname.replace(/^\/api\/settings/, '')
       const url = `${VPS_HTTP}/api/settings${targetPath}${search}`
 
-      const fetchOpts = { method: req.method, headers: {} }
+      const fetchOpts = { method: req.method, headers: {}, agent: VPS_AGENT }
 
       // Forward Content-Type and Authorization for write operations
       if (req.headers['content-type']) {
@@ -50,12 +52,38 @@ export default async function handler(req, res) {
       return res.status(response.status).json(data)
     }
 
+    // ─── Hermes Agent API ───
+    if (pathname.startsWith('/api/hermes/')) {
+      const targetPath = pathname.replace(/^\/api\/hermes/, '')
+      const url = `http://89.167.74.30:3003${targetPath}${search}`
+      const response = await fetch(url, {
+        method: req.method,
+        headers: { 'Accept': 'application/json' },
+      })
+      const data = await response.json()
+      return res.status(response.status).json(data)
+    }
+
+    // ─── Booking API ───
+    if (pathname.startsWith('/api/booking/')) {
+      const targetPath = pathname.replace(/^\/api\/booking/, '/booking')
+      const url = `http://89.167.74.30:3003${targetPath}${search}`
+      const opts = { method: req.method, headers: { 'Accept': 'application/json' } }
+      if (['PUT', 'POST'].includes(req.method)) {
+        opts.headers['Content-Type'] = 'application/json'
+        if (req.body) opts.body = JSON.stringify(req.body)
+      }
+      const response = await fetch(url, opts)
+      const data = await response.json()
+      return res.status(response.status).json(data)
+    }
+
     // ─── Dashboard API → VPS port 3000 → Hostinger proxy → port 3002 ───
     if (pathname.startsWith('/api/costs/') || pathname.startsWith('/api/health/') || 
         pathname.startsWith('/api/agents') || pathname.startsWith('/api/status')) {
       const targetPath = pathname.replace(/^\/api/, '')
       const url = `${VPS_HTTP}/dashboard-api${targetPath}${search}`
-      const response = await fetch(url, { method: req.method })
+      const response = await fetch(url, { method: req.method, agent: VPS_AGENT })
       const data = await response.json()
       return res.status(response.status).json(data)
     }

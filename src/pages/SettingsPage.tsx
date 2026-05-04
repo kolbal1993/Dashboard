@@ -37,7 +37,7 @@ const API_PROVIDERS = [
   { id: 'elevenlabs', name: 'ElevenLabs', color: '#6366F1' },
 ];
 
-export function SettingsPage() {
+export function SettingsPage({ onTabChange }: { onTabChange?: (tab: string) => void }) {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [apiKeys, setApiKeys] = useState<APIKey[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,6 +156,28 @@ export function SettingsPage() {
           🔑 API Keys
         </button>
       </div>
+
+      {/* ───────────── QUICK NAV ───────────── */}
+      {onTabChange && (
+        <div className="settings-section">
+          <div className="api-keys-header">
+            <h2>🧭 Gyors navigáció</h2>
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {[
+              { tab: 'monitor', icon: '🖥️', label: 'Monitor' },
+              { tab: 'tasks', icon: '📋', label: 'Tasks' },
+              { tab: 'projektek', icon: '📁', label: 'Projektek' },
+              { tab: 'chat', icon: '💬', label: 'Chat' },
+              { tab: 'finance', icon: '💰', label: 'Finance' },
+            ].map(link => (
+              <button key={link.tab} className="nav-quick-btn" onClick={() => onTabChange(link.tab)}>
+                {link.icon} {link.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ───────────── AGENT MODELS ───────────── */}
       <div className="settings-section">

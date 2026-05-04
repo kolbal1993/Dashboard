@@ -14,7 +14,7 @@ interface ThemeState {
   setSelectedTask: (t: Task | null) => void
 }
 
-type Tab = 'monitor' | 'tasks' | 'projektek' | 'chat' | 'finance' | 'settings'
+type Tab = 'dashboard' | 'tasks' | 'chat' | 'org' | 'tools' | 'settings' | 'hermes'
 const Theme = createContext<ThemeState>(null!)
 export function useApp() { return useContext(Theme) }
 
@@ -193,7 +193,7 @@ export default function App() {
   const [tasks, setTasks] = useState<Task[]>(defaultTasks)
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(defaultChat)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
-  const [tab, setTab] = useState<Tab>('monitor')
+  const [tab, setTab] = useState<Tab>('dashboard')
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
   const [chatMsgs, setChatMsgs] = useState<{role:'user'|'assistant', content:string}[]>([])
@@ -239,12 +239,13 @@ export default function App() {
 
   function renderContent() {
     switch (tab) {
-      case 'monitor': return <DashboardView tasks={tasks} chatMsgs={chatMsgs} />
+      case 'dashboard': return <DashboardView tasks={tasks} chatMsgs={chatMsgs} />
       case 'tasks': return <TasksView tasks={tasks} count={count} setSelectedTask={setSelectedTask} />
-      case 'projektek': return <ProjektekView />
       case 'chat': return <ChatView input={chatInput} setInput={setChatInput} msgs={chatMsgs} loading={chatLoading} send={sendChat} bottomRef={bottomRef} />
-      case 'finance': return <FinanceView />
-      case 'settings': return <SettingsPage onTabChange={(t: string) => setTab(t as Tab)} />
+      case 'org': return <OrgView />
+      case 'tools': return <ToolsView />
+      case 'hermes': return <HermesView />
+      case 'settings': return <SettingsPage />
     }
   }
 
@@ -252,17 +253,18 @@ export default function App() {
     <Theme.Provider value={{ tasks, setTasks, chatMessages, addChat, selectedTask, setSelectedTask }}>
       <div className="app">
         <nav className="top-nav">
-          <div className="nav-brand" onClick={() => setTab('monitor')}>
+          <div className="nav-brand" onClick={() => setTab('dashboard')}>
             <span className="nav-brand-icon">🏆</span>
             <span className="nav-brand-text">Clawdius</span>
           </div>
           <div className="nav-tabs">
-            <button className={`nav-tab ${tab==='monitor'?'active':''}`} onClick={() => setTab('monitor')}>🖥️ MONITOR</button>
-            <button className={`nav-tab ${tab==='tasks'?'active':''}`} onClick={() => setTab('tasks')}>📋 TASKS</button>
-            <button className={`nav-tab ${tab==='projektek'?'active':''}`} onClick={() => setTab('projektek')}>📁 PROJEKTEK</button>
-            <button className={`nav-tab ${tab==='chat'?'active':''}`} onClick={() => setTab('chat')}>💬 CHAT</button>
-            <button className={`nav-tab ${tab==='finance'?'active':''}`} onClick={() => setTab('finance')}>💰 FINANCE</button>
-            <button className={`nav-tab ${tab==='settings'?'active':''}`} onClick={() => setTab('settings')}>⚙️ SETTINGS</button>
+            <button className={`nav-tab ${tab==='dashboard'?'active':''}`} onClick={() => setTab('dashboard')}>MISSION CONTROL</button>
+            <button className={`nav-tab ${tab==='tasks'?'active':''}`} onClick={() => setTab('tasks')}>TASKS</button>
+            <button className={`nav-tab ${tab==='chat'?'active':''}`} onClick={() => setTab('chat')}>CHAT</button>
+            <button className={`nav-tab ${tab==='org'?'active':''}`} onClick={() => setTab('org')}>ORG</button>
+            <button className={`nav-tab ${tab==='tools'?'active':''}`} onClick={() => setTab('tools')}>TOOLS</button>
+            <button className={`nav-tab ${tab==='hermes'?'active':''}`} onClick={() => setTab('hermes')}>🤖 HERMES</button>
+            <button className={`nav-tab ${tab==='settings'?'active':''}`} onClick={() => setTab('settings')}>SETTINGS</button>
           </div>
           <div className="nav-status">
             <span className="status-dot online" />
@@ -1331,245 +1333,5 @@ function CostDetail() {
         </div>
       </div>
     </>
-  )
-}
-
-// ====== PROJEKTEK VIEW ======
-function ProjektekView() {
-  const projects = [
-    {
-      id: 'filtranova', name: 'FILTRANOVA', icon: '💧',
-      desc: 'Víztisztító cég weboldal + chatbot',
-      devCost: '€1,200', runCost: '€24/mo',
-      links: [
-        { icon: '🌐', label: 'Weboldal', url: 'https://filtranova.mindennapai.eu' },
-        { icon: '📊', label: 'Admin', url: 'https://filtranova.mindennapai.eu/admin' },
-        { icon: '🤖', label: 'Chatbot API', url: 'http://localhost:3004' },
-        { icon: '📁', label: 'GitHub', url: '#' },
-      ],
-      stats: { docs: 26, chats: '143', languages: 3 },
-    },
-    {
-      id: 'booking', name: 'Booking Rendszer', icon: '📅',
-      desc: 'Online foglalási rendszer',
-      devCost: '€800', runCost: '€12/mo',
-      links: [
-        { icon: '🌐', label: 'Foglalás oldal', url: 'https://booking.mindennapai.eu' },
-        { icon: '📊', label: 'Admin', url: 'https://dashboard.mindennapai.eu' },
-        { icon: '📁', label: 'GitHub', url: '#' },
-      ],
-      stats: { bookings: '28', services: 5, avgRating: '4.8' },
-    },
-    {
-      id: 'xulinalex', name: 'XulinaleX', icon: '🎵',
-      desc: 'Zenei release management',
-      devCost: '€600', runCost: '€0/mo (Vercel)',
-      links: [
-        { icon: '🌐', label: 'Release Manager', url: 'https://xulinalex.mindennapai.eu' },
-        { icon: '📁', label: 'GitHub', url: '#' },
-      ],
-      stats: { tracks: '12', releases: 3, platforms: 2 },
-    },
-    {
-      id: 'clawdius', name: 'Clawdius Platform', icon: '🏆',
-      desc: 'AI agent platform & dashboard',
-      devCost: '€2,400', runCost: '€0/mo (Vercel)',
-      links: [
-        { icon: '🌐', label: 'Dashboard', url: 'https://dashboard.mindennapai.eu' },
-        { icon: '🌐', label: 'Landing', url: 'https://clawdius-landing-v2.vercel.app' },
-        { icon: '📁', label: 'GitHub', url: '#' },
-        { icon: '🤖', label: 'Hermes API', url: 'http://localhost:8642' },
-      ],
-      stats: { agents: 8, workflows: '9', uptime: '99.9%' },
-    },
-    {
-      id: 'mindennapai', name: 'mindennapai.eu', icon: '🌐',
-      desc: 'Fő portál — kurzusok, tudástár',
-      devCost: '€900', runCost: '€0/mo (Vercel)',
-      links: [
-        { icon: '🌐', label: 'Weboldal', url: 'https://www.mindennapai.eu' },
-        { icon: '📁', label: 'GitHub', url: '#' },
-      ],
-      stats: { courses: 7, articles: '24', visitors: '340' },
-    },
-  ]
-
-  const [selected, setSelected] = useState<string | null>(null)
-  const proj = projects.find(p => p.id === selected)
-
-  return (
-    <div className="projektek-page">
-      <div className="section-top">
-        <div>
-          <h1 className="section-title">📁 Projektek</h1>
-          <p className="section-sub">{projects.length} aktív projekt · összes fejlesztési költség: €5,900</p>
-        </div>
-      </div>
-
-      <div className="projektek-grid">
-        {projects.map(p => (
-          <div key={p.id} className="projekt-card" onClick={() => setSelected(p.id)}>
-            <div className="projekt-card-header">
-              <span className="projekt-icon">{p.icon}</span>
-              <div>
-                <div className="projekt-name">{p.name}</div>
-                <div className="projekt-desc">{p.desc}</div>
-              </div>
-            </div>
-            <div className="projekt-costs">
-              <div className="projekt-cost-item">
-                <span className="projekt-cost-lbl">Fejlesztés</span>
-                <span className="projekt-cost-val dev">{p.devCost}</span>
-              </div>
-              <div className="projekt-cost-item">
-                <span className="projekt-cost-lbl">Futtatás/hó</span>
-                <span className="projekt-cost-val run">{p.runCost}</span>
-              </div>
-            </div>
-            <div className="projekt-stats-row">
-              {Object.entries(p.stats).map(([k, v]) => (
-                <div key={k} className="projekt-stat">
-                  <span className="projekt-stat-val">{v}</span>
-                  <span className="projekt-stat-lbl">{k}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Modal */}
-      {proj && (
-        <div className="modal-overlay" onClick={() => setSelected(null)}>
-          <div className="modal projekt-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2><span style={{ marginRight: 8 }}>{proj.icon}</span>{proj.name}</h2>
-              <button className="modal-close" onClick={() => setSelected(null)}>✕</button>
-            </div>
-            <div className="modal-body">
-              <p className="modal-desc">{proj.desc}</p>
-
-              <h3 style={{ fontSize: 13, fontWeight: 600, margin: '16px 0 8px', color: 'var(--text2)' }}>🔗 Linkek</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {proj.links.map((l, i) => (
-                  <a key={i} href={l.url} target="_blank" rel="noopener noreferrer"
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 8,
-                      padding: '10px 14px', borderRadius: 8,
-                      background: 'var(--bg3)', border: '1px solid var(--border)',
-                      color: 'var(--text)', textDecoration: 'none', fontSize: 13,
-                    }}>
-                    <span>{l.icon}</span>
-                    <span>{l.label}</span>
-                    <span style={{ marginLeft: 'auto', color: 'var(--text3)', fontSize: 11 }}>{l.url}</span>
-                  </a>
-                ))}
-              </div>
-
-              <h3 style={{ fontSize: 13, fontWeight: 600, margin: '16px 0 8px', color: 'var(--text2)' }}>💰 Költségek</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <div style={{ padding: '12px 16px', borderRadius: 8, background: 'var(--bg3)', border: '1px solid var(--border)' }}>
-                  <div style={{ fontSize: 11, color: 'var(--text3)' }}>Fejlesztés</div>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: '#f59e0b' }}>{proj.devCost}</div>
-                </div>
-                <div style={{ padding: '12px 16px', borderRadius: 8, background: 'var(--bg3)', border: '1px solid var(--border)' }}>
-                  <div style={{ fontSize: 11, color: 'var(--text3)' }}>Futtatás / hó</div>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: '#10b981' }}>{proj.runCost}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ====== FINANCE VIEW ======
-function FinanceView() {
-  const months = [
-    { label: 'Jan', cost: 0.12, h: 8 },
-    { label: 'Feb', cost: 0.08, h: 5 },
-    { label: 'Már', cost: 0.25, h: 15 },
-    { label: 'Ápr', cost: 1.20, h: 80, active: true },
-    { label: 'Máj', cost: 0, h: 2 },
-    { label: 'Jún', cost: 0, h: 2 },
-  ]
-
-  const totalDev = 5900
-  const totalRun = 48
-
-  const affiliates = [
-    { name: 'n8n', commission: '30% első év', priority: '🔴', status: 'Regisztráció kell' },
-    { name: 'Hostinger', commission: '40-60%', priority: '🔴', status: 'Regisztráció kell' },
-    { name: 'Zapier', commission: 'Változó', priority: '🟡', status: 'Függőben' },
-    { name: 'ElevenLabs', commission: 'Van program', priority: '🟡', status: 'Függőben' },
-  ]
-
-  return (
-    <div className="finance-page">
-      <div className="section-top">
-        <div>
-          <h1 className="section-title">💰 Finance</h1>
-          <p className="section-sub">Költségek · Kimutatások · Affiliate</p>
-        </div>
-      </div>
-
-      {/* Összesítés */}
-      <div className="metrics-row">
-        <div className="metric-card" style={{ borderTop: '2px solid #3b82f6' }}>
-          <div className="metric-val" style={{ color: '#3b82f6' }}>€{totalDev.toLocaleString()}</div>
-          <div className="metric-lbl">Fejlesztés összköltség</div>
-          <div className="metric-sub">{5} projekt</div>
-        </div>
-        <div className="metric-card" style={{ borderTop: '2px solid #10b981' }}>
-          <div className="metric-val" style={{ color: '#10b981' }}>€{totalRun}/hó</div>
-          <div className="metric-lbl">Futtatási költség</div>
-          <div className="metric-sub">összes projekt</div>
-        </div>
-        <div className="metric-card" style={{ borderTop: '2px solid #f59e0b' }}>
-          <div className="metric-val" style={{ color: '#f59e0b' }}>$1.20</div>
-          <div className="metric-lbl">AI API költség</div>
-          <div className="metric-sub">ebben a hónapban</div>
-        </div>
-        <div className="metric-card" style={{ borderTop: '2px solid #8b5cf6' }}>
-          <div className="metric-val" style={{ color: '#8b5cf6' }}>€0</div>
-          <div className="metric-lbl">Affiliate bevétel</div>
-          <div className="metric-sub">még nincs regisztráció</div>
-        </div>
-      </div>
-
-      {/* Havi AI költség */}
-      <div className="dash-grid2" style={{ marginBottom: 20 }}>
-        <div className="dash-card">
-          <div className="dash-card-title">📈 AI API havi költség</div>
-          <div className="dash-chart-v">
-            {months.map((m, i) => (
-              <div key={i} className="dash-col-wrap">
-                <div className="dash-col-val">{m.cost > 0 ? `€${m.cost.toFixed(2)}` : '-'}</div>
-                <div className="dash-col-track">
-                  <div className={`dash-col-fill${m.active ? ' active' : ''}`} style={{ height: `${m.h}%` }} />
-                </div>
-                <div className={`dash-col-label${m.active ? ' active' : ''}`}>{m.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="dash-card">
-          <div className="dash-card-title">📢 Affiliate programok</div>
-          <div className="dash-platforms">
-            {affiliates.map((a, i) => (
-              <div key={i} className="dash-plat-row">
-                <span className="dash-plat-name" style={{ fontSize: 12 }}>{a.priority} {a.name}</span>
-                <div style={{ flex: 1 }} />
-                <span style={{ fontSize: 11, color: 'var(--text2)' }}>{a.commission}</span>
-                <span style={{ fontSize: 10, color: 'var(--text3)', marginLeft: 8 }}>{a.status}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
   )
 }
