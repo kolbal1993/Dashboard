@@ -1345,9 +1345,26 @@ function ProjektekView() {
         { icon: '🌐', label: 'Weboldal', url: 'https://filtranova.mindennapai.eu' },
         { icon: '📊', label: 'Admin', url: 'https://filtranova.mindennapai.eu/admin' },
         { icon: '🤖', label: 'Chatbot API', url: 'http://localhost:3004' },
-        { icon: '📁', label: 'GitHub', url: '#' },
       ],
       stats: { docs: 26, chats: '143', languages: 3 },
+      dashboard: {
+        '📄 Dokumentumok': [
+          { label: 'SK', value: '7', sub: 'szlovák' },
+          { label: 'HU', value: '10', sub: 'magyar' },
+          { label: 'EN', value: '9', sub: 'angol' },
+        ],
+        '🏷️ Kategóriák': [
+          { label: 'Termékek', value: '14' },
+          { label: 'Szolgáltatások', value: '4' },
+          { label: 'FAQ', value: '5' },
+          { label: 'Cég', value: '3' },
+        ],
+        '🤖 Chatbot': [
+          { label: 'Válaszidő', value: '<1s' },
+          { label: 'Modell', value: 'DeepSeek V4' },
+          { label: 'Nyelvek', value: '3' },
+        ],
+      },
     },
     {
       id: 'booking', name: 'Booking Rendszer', icon: '📅',
@@ -1356,9 +1373,24 @@ function ProjektekView() {
       links: [
         { icon: '🌐', label: 'Foglalás oldal', url: 'https://booking.mindennapai.eu' },
         { icon: '📊', label: 'Admin', url: 'https://dashboard.mindennapai.eu' },
-        { icon: '📁', label: 'GitHub', url: '#' },
       ],
-      stats: { bookings: '28', services: 5, avgRating: '4.8' },
+      stats: { bookings: '1', services: 9, dbSize: 'SQLite' },
+      dashboard: {
+        '📊 Foglalások': [
+          { label: 'Összes', value: '1' },
+          { label: 'Ebben a hónapban', value: '1' },
+          { label: 'Lemondva', value: '0' },
+        ],
+        '🛠️ Szolgáltatások': [
+          { label: 'Aktív', value: '9' },
+          { label: 'Gumis', value: '6' },
+          { label: 'Egyéb', value: '3' },
+        ],
+        '📅 Naptár': [
+          { label: 'Google Sync', value: '✅' },
+          { label: 'Következő', value: 'Máj 4.' },
+        ],
+      },
     },
     {
       id: 'xulinalex', name: 'XulinaleX', icon: '🎵',
@@ -1366,9 +1398,22 @@ function ProjektekView() {
       devCost: '€600', runCost: '€0/mo (Vercel)',
       links: [
         { icon: '🌐', label: 'Release Manager', url: 'https://xulinalex.mindennapai.eu' },
-        { icon: '📁', label: 'GitHub', url: '#' },
       ],
-      stats: { tracks: '12', releases: 3, platforms: 2 },
+      stats: { tracks: '0', releases: 0, platforms: 2 },
+      dashboard: {
+        '🎵 Tracks': [
+          { label: 'Feltöltve', value: '0' },
+          { label: 'Feldolgozás alatt', value: '0' },
+        ],
+        '📀 Releases': [
+          { label: 'Megjelent', value: '0' },
+          { label: 'Tervezett', value: '0' },
+        ],
+        '🔊 Platformok': [
+          { label: 'Spotify', value: '❌' },
+          { label: 'Apple Music', value: '❌' },
+        ],
+      },
     },
     {
       id: 'clawdius', name: 'Clawdius Platform', icon: '🏆',
@@ -1377,10 +1422,26 @@ function ProjektekView() {
       links: [
         { icon: '🌐', label: 'Dashboard', url: 'https://dashboard.mindennapai.eu' },
         { icon: '🌐', label: 'Landing', url: 'https://clawdius-landing-v2.vercel.app' },
-        { icon: '📁', label: 'GitHub', url: '#' },
         { icon: '🤖', label: 'Hermes API', url: 'http://localhost:8642' },
+        { icon: '📁', label: 'GitHub', url: 'https://github.com/kolbal1993/Dashboard' },
       ],
       stats: { agents: 8, workflows: '9', uptime: '99.9%' },
+      dashboard: {
+        '🤖 AI Agentek': [
+          { label: 'Online', value: '6' },
+          { label: 'Idle', value: '2' },
+          { label: 'Összesen', value: '8' },
+        ],
+        '⚡ n8n Workflowok': [
+          { label: 'Aktív', value: '9' },
+          { label: 'Sikertelen', value: '0' },
+        ],
+        '🖥️ Infrastruktúra': [
+          { label: 'Vercel', value: '✅' },
+          { label: 'VPS (Hetzner)', value: '✅' },
+          { label: 'Open WebUI', value: '✅' },
+        ],
+      },
     },
     {
       id: 'mindennapai', name: 'mindennapai.eu', icon: '🌐',
@@ -1388,14 +1449,34 @@ function ProjektekView() {
       devCost: '€900', runCost: '€0/mo (Vercel)',
       links: [
         { icon: '🌐', label: 'Weboldal', url: 'https://www.mindennapai.eu' },
-        { icon: '📁', label: 'GitHub', url: '#' },
       ],
       stats: { courses: 7, articles: '24', visitors: '340' },
+      dashboard: {
+        '📚 Tartalom': [
+          { label: 'Kurzusok', value: '7' },
+          { label: 'Cikkek', value: '24' },
+          { label: 'Videók', value: '12' },
+        ],
+        '📊 Látogatottság': [
+          { label: 'Havi', value: '~340' },
+          { label: 'Napi', value: '~11' },
+        ],
+        '🔗 Domain': [
+          { label: 'Hostinger', value: '✅' },
+          { label: 'Vercel', value: '✅' },
+        ],
+      },
     },
   ]
 
   const [selected, setSelected] = useState<string | null>(null)
+  const [modalTab, setModalTab] = useState<'dashboard' | 'links' | 'costs'>('dashboard')
   const proj = projects.find(p => p.id === selected)
+
+  // Reset modal tab when opening a new project
+  useEffect(() => {
+    if (selected) setModalTab('dashboard')
+  }, [selected])
 
   return (
     <div className="projektek-page">
@@ -1446,37 +1527,79 @@ function ProjektekView() {
               <h2><span style={{ marginRight: 8 }}>{proj.icon}</span>{proj.name}</h2>
               <button className="modal-close" onClick={() => setSelected(null)}>✕</button>
             </div>
+
+            {/* Modal tabs */}
+            <div className="projekt-modal-tabs">
+              {(['dashboard', 'links', 'costs'] as const).map(tab => (
+                <button
+                  key={tab}
+                  className={`projekt-modal-tab ${modalTab === tab ? 'active' : ''}`}
+                  onClick={() => setModalTab(tab)}
+                >
+                  {tab === 'dashboard' ? '📊 Dashboard' : tab === 'links' ? '🔗 Linkek' : '💰 Költségek'}
+                </button>
+              ))}
+            </div>
+
             <div className="modal-body">
               <p className="modal-desc">{proj.desc}</p>
 
-              <h3 style={{ fontSize: 13, fontWeight: 600, margin: '16px 0 8px', color: 'var(--text2)' }}>🔗 Linkek</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {proj.links.map((l, i) => (
-                  <a key={i} href={l.url} target="_blank" rel="noopener noreferrer"
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 8,
-                      padding: '10px 14px', borderRadius: 8,
-                      background: 'var(--bg3)', border: '1px solid var(--border)',
-                      color: 'var(--text)', textDecoration: 'none', fontSize: 13,
-                    }}>
-                    <span>{l.icon}</span>
-                    <span>{l.label}</span>
-                    <span style={{ marginLeft: 'auto', color: 'var(--text3)', fontSize: 11 }}>{l.url}</span>
-                  </a>
-                ))}
-              </div>
+              {/* DASHBOARD TAB */}
+              {modalTab === 'dashboard' && (
+                <div>
+                  {Object.entries(proj.dashboard).map(([sectionTitle, items]) => (
+                    <div key={sectionTitle} className="projekt-dash-section">
+                      <div className="projekt-dash-section-title">{sectionTitle}</div>
+                      <div className="projekt-dash-grid">
+                        {items.map((item: any, i: number) => (
+                          <div key={i} className="projekt-dash-card">
+                            <div className="projekt-dash-val">{item.value}</div>
+                            <div className="projekt-dash-lbl">{item.label}</div>
+                            {'sub' in item && <div className="projekt-dash-sub">{item.sub}</div>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-              <h3 style={{ fontSize: 13, fontWeight: 600, margin: '16px 0 8px', color: 'var(--text2)' }}>💰 Költségek</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <div style={{ padding: '12px 16px', borderRadius: 8, background: 'var(--bg3)', border: '1px solid var(--border)' }}>
-                  <div style={{ fontSize: 11, color: 'var(--text3)' }}>Fejlesztés</div>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: '#f59e0b' }}>{proj.devCost}</div>
+              {/* LINKS TAB */}
+              {modalTab === 'links' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {proj.links.map((l, i) => (
+                    <a key={i} href={l.url} target="_blank" rel="noopener noreferrer"
+                      className="projekt-link-row">
+                      <span>{l.icon}</span>
+                      <span>{l.label}</span>
+                      <span className="projekt-link-url">{l.url.replace(/https?:\/\//, '')}</span>
+                    </a>
+                  ))}
                 </div>
-                <div style={{ padding: '12px 16px', borderRadius: 8, background: 'var(--bg3)', border: '1px solid var(--border)' }}>
-                  <div style={{ fontSize: 11, color: 'var(--text3)' }}>Futtatás / hó</div>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: '#10b981' }}>{proj.runCost}</div>
+              )}
+
+              {/* COSTS TAB */}
+              {modalTab === 'costs' && (
+                <div>
+                  <div className="projekt-cost-detail-grid">
+                    <div className="projekt-cost-detail-card">
+                      <div className="projekt-cost-detail-lbl">Fejlesztési költség</div>
+                      <div className="projekt-cost-detail-val dev">{proj.devCost}</div>
+                      <div className="projekt-cost-detail-sub">egyszeri · design + fejlesztés + deploy</div>
+                    </div>
+                    <div className="projekt-cost-detail-card">
+                      <div className="projekt-cost-detail-lbl">Futtatási költség</div>
+                      <div className="projekt-cost-detail-val run">{proj.runCost}</div>
+                      <div className="projekt-cost-detail-sub">havonta · hosting + API + domain</div>
+                    </div>
+                  </div>
+                  <div className="projekt-cost-note">
+                    💡 A fejlesztési költség egyszeri, a futtatási költség havonta ismétlődő.
+                    Az első évben összesen: {proj.devCost} + {proj.runCost} × 12 = 
+                    <strong> €{1200 + (proj.id === 'filtranova' ? 288 : proj.id === 'booking' ? 144 : 0).toLocaleString()}</strong>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
