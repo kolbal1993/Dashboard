@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clawdius Mission Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-dark: #0a0e17;
+  --bg-panel: #111827;
+  --bg-card: #1a2332;
+  --bg-card-hover: #1f2b3d;
+  --border: #2a3a4e;
+  --text-primary: #e8edf5;
+  --text-secondary: #8899b4;
+  --accent-teal: #2dd4bf;
+  --accent-blue: #60a5fa;
+  --accent-purple: #a78bfa;
+  --accent-amber: #f59e0b;
+  --accent-rose: #fb7185;
+  --accent-green: #34d399;
+  --glow-teal: rgba(45, 212, 191, 0.15);
+  --glow-blue: rgba(96, 165, 250, 0.12);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== HEADER ===== */
+.top-bar {
+  background: linear-gradient(135deg, #0d1520 0%, #111827 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.logo-icon {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--accent-teal), #0d9488);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 0 20px var(--glow-teal);
+}
+.logo-text {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #e8edf5, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.logo-sub {
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.system-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.status-label {
+  font-weight: 600;
+  color: var(--accent-green);
+}
+.header-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* ===== OFFICE ===== */
+.office-container {
+  padding: 24px 32px 40px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.office-title {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.office-title h1 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+.office-title p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* ===== OFFICE FLOOR ===== */
+.office-floor {
+  position: relative;
+  background: linear-gradient(180deg, #0f1928 0%, #0a0e17 100%);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  padding: 0;
+  overflow: hidden;
+  min-height: 600px;
+}
+
+/* Wall */
+.office-wall {
+  background: linear-gradient(180deg, #141e2e 0%, #0f1928 100%);
+  padding: 40px 40px 20px;
+  border-bottom: 2px solid var(--border);
+  position: relative;
+}
+
+/* Windows */
+.windows-row {
+  display: flex;
+  gap: 60px;
+  justify-content: center;
+}
+.window {
+  width: 120px;
+  height: 140px;
+  background: linear-gradient(180deg, #1a2a44 0%, #0d1520 100%);
+  border: 2px solid var(--border);
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  overflow: hidden;
+}
+.window::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: 
+    radial-gradient(ellipse at 30% 20%, rgba(147, 197, 253, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 30%, rgba(167, 139, 250, 0.04) 0%, transparent 50%);
+}
+.window-line-h {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: rgba(42, 58, 78, 0.6);
+  top: 50%;
+}
+.window-line-v {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: rgba(42, 58, 78, 0.6);
+  left: 50%;
+}
+.window-star {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+}
+
+/* Office name on wall */
+.office-sign {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  opacity: 0.5;
+  font-weight: 500;
+}
+
+/* ===== DESKS ===== */
+.desks-area {
+  padding: 30px 40px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+}
+
+.desk {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 16px 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  cursor: default;
+}
+.desk:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(45, 212, 191, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+/* Desk status indicator top */
+.desk-status-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+}
+.desk-status-bar .fill {
+  height: 100%;
+  width: 100%;
+  transition: all 0.5s ease;
+  border-radius: 16px 16px 0 0;
+}
+.status-idle .fill { background: var(--text-secondary); width: 30%; }
+.status-working .fill { background: var(--accent-teal); animation: working-bar 2s ease-in-out infinite; }
+.status-thinking .fill { background: var(--accent-amber); animation: thinking-bar 1.5s ease-in-out infinite; }
+.status-done .fill { background: var(--accent-green); width: 100%; }
+
+@keyframes working-bar {
+  0%, 100% { width: 40%; }
+  50% { width: 85%; }
+}
+@keyframes thinking-bar {
+  0%, 100% { width: 20%; opacity: 0.6; }
+  50% { width: 70%; opacity: 1; }
+}
+
+/* Avatar */
+.avatar-wrap {
+  position: relative;
+  width: 72px; height: 72px;
+  margin: 0 auto 12px;
+}
+.avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  position: relative;
+  z-index: 2;
+  transition: transform 0.3s ease;
+}
+.desk:hover .avatar {
+  transform: scale(1.08);
+}
+.avatar-ring {
+  position: absolute;
+  top: -3px; left: -3px; right: -3px; bottom: -3px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  z-index: 1;
+  transition: all 0.5s ease;
+}
+.status-idle .avatar-ring { border-color: rgba(136, 153, 180, 0.3); }
+.status-working .avatar-ring { border-color: var(--accent-teal); animation: ring-pulse 2s ease-in-out infinite; }
+.status-thinking .avatar-ring { border-color: var(--accent-amber); animation: ring-pulse 1.5s ease-in-out infinite; }
+.status-done .avatar-ring { border-color: var(--accent-green); }
+
+@keyframes ring-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); box-shadow: 0 0 15px currentColor; }
+}
+
+.avatar-color-1 { background: linear-gradient(135deg, #2dd4bf, #0d9488); }
+.avatar-color-2 { background: linear-gradient(135deg, #f97316, #ea580c); }
+.avatar-color-3 { background: linear-gradient(135deg, #60a5fa, #2563eb); }
+.avatar-color-4 { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
+.avatar-color-5 { background: linear-gradient(135deg, #fb7185, #e11d48); }
+.avatar-color-6 { background: linear-gradient(135deg, #34d399, #059669); }
+.avatar-color-7 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.avatar-color-8 { background: linear-gradient(135deg, #e879f9, #c026d3); }
+
+/* Agent name */
+.agent-name {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  letter-spacing: -0.3px;
+}
+.agent-role {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+/* Current task */
+.current-task {
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  padding: 8px 10px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--text-secondary);
+  border: 1px solid rgba(42, 58, 78, 0.4);
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.4;
+  transition: all 0.3s ease;
+}
+
+.status-working .current-task {
+  border-color: rgba(45, 212, 191, 0.25);
+  color: var(--accent-teal);
+}
+.status-thinking .current-task {
+  border-color: rgba(245, 158, 11, 0.25);
+  color: var(--accent-amber);
+}
+.status-done .current-task {
+  border-color: rgba(52, 211, 153, 0.25);
+  color: var(--accent-green);
+}
+
+/* Thinking dots animation */
+.thinking-dots::after {
+  content: '';
+  animation: dots 1.5s steps(3, end) infinite;
+}
+@keyframes dots {
+  0% { content: ''; }
+  33% { content: '.'; }
+  66% { content: '..'; }
+  100% { content: '...'; }
+}
+
+/* Desk monitor decoration */
+.desk-monitor {
+  width: 40px;
+  height: 28px;
+  background: linear-gradient(180deg, #0a1628, #0d1520);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  margin: 0 auto 10px;
+  position: relative;
+  overflow: hidden;
+}
+.desk-monitor::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 12px; height: 4px;
+  background: var(--border);
+  border-radius: 0 0 1px 1px;
+}
+.desk-monitor .screen-content {
+  position: absolute;
+  top: 3px; left: 3px; right: 3px; bottom: 5px;
+  background: linear-gradient(180deg, rgba(45,212,191,0.08), transparent);
+  border-radius: 1px;
+}
+.status-working .desk-monitor .screen-content {
+  animation: screen-scan 2s linear infinite;
+}
+@keyframes screen-scan {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.3; }
+}
+
+/* Small lamp on desk */
+.desk-lamp {
+  position: absolute;
+  top: 8px; right: 12px;
+  font-size: 10px;
+  opacity: 0.4;
+}
+
+/* ===== LEGEND ===== */
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 24px;
+  padding: 12px 20px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+.legend-dot.idle { background: var(--text-secondary); }
+.legend-dot.working { background: var(--accent-teal); }
+.legend-dot.thinking { background: var(--accent-amber); }
+.legend-dot.done { background: var(--accent-green); }
+
+/* ===== FOOTER STATS ===== */
+.stats-bar {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+.stat-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--accent-teal);
+  font-family: 'JetBrains Mono', monospace;
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .top-bar { padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
+  .office-container { padding: 16px; }
+  .desks-area { padding: 20px; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .windows-row { gap: 20px; }
+  .window { width: 80px; height: 100px; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== ANIMATED BACKGROUND PARTICLES ===== */
+.particles {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(45, 212, 191, 0.15);
+  border-radius: 50%;
+  animation: float linear infinite;
+}
+@keyframes float {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
+
+/* ===== ACTIVITY LOG MINI ===== */
+.activity-feed {
+  margin-top: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+.activity-feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.activity-feed-header h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.activity-list {
+  max-height: 80px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  opacity: 0;
+  animation: fade-in-item 0.4s ease forwards;
+}
+.activity-item .time {
+  color: var(--text-secondary);
+  opacity: 0.5;
+  min-width: 60px;
+}
+.activity-item .emoji { font-size: 14px; }
+@keyframes fade-in-item {
+  to { opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<!-- Background particles -->
+<div class="particles" id="particles"></div>
+
+<!-- ===== TOP BAR ===== -->
+<header class="top-bar">
+  <div class="logo">
+    <div class="logo-icon">🦞</div>
+    <div>
+      <div class="logo-text">Clawdius</div>
+      <div class="logo-sub">Mission Control</div>
+    </div>
+  </div>
+  <div class="top-right">
+    <div class="system-status">
+      <span class="status-dot"></span>
+      <span>All Systems <span class="status-label">Online</span></span>
+    </div>
+    <span class="header-time" id="clock">--:--:--</span>
+  </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<div class="office-container">
+  <div class="office-title">
+    <h1>🏢 Agent Operations Center</h1>
+    <p>Valós idejű irodai felügyelet — Clawdius AI Agency</p>
+  </div>
+
+  <!-- OFFICE -->
+  <div class="office-floor">
+    <!-- Wall with windows -->
+    <div class="office-wall">
+      <div class="windows-row">
+        <div class="window"><div class="window-line-h"></div><div class="window-line-v"></div></div>
+        <div class="window"><div class="window-line-h"></div><div class="window-line-v"></div></div>
+        <div class="window"><div class="window-line-h"></div><div class="window-line-v"></div></div>
+      </div>
+      <div class="office-sign">✦ Clawdius HQ — Budapest ✦</div>
+    </div>
+
+    <!-- DESKS -->
+    <div class="desks-area" id="desksContainer"></div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot idle"></span> Idle</div>
+    <div class="legend-item"><span class="legend-dot working"></span> Working</div>
+    <div class="legend-item"><span class="legend-dot thinking"></span> Thinking</div>
+    <div class="legend-item"><span class="legend-dot done"></span> Completed</div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-card"><div class="stat-value" id="statOnline">0</div><div class="stat-label">Agents Online</div></div>
+    <div class="stat-card"><div class="stat-value" id="statActive">0</div><div class="stat-label">Currently Working</div></div>
+    <div class="stat-card"><div class="stat-value" id="statTasks">0</div><div class="stat-label">Tasks Today</div></div>
+    <div class="stat-card"><div class="stat-value" id="statUptime">0</div><div class="stat-label">Uptime (h)</div></div>
+  </div>
+
+  <!-- ACTIVITY FEED -->
+  <div class="activity-feed">
+    <div class="activity-feed-header">
+      <h3>📋 Élő Tevékenységi Napló</h3>
+      <span style="font-size:11px;color:var(--text-secondary);">auto-refresh</span>
+    </div>
+    <div class="activity-list" id="activityList"></div>
+  </div>
+</div>
+
+<script>
+// ===== AGENTS =====
+const AGENTS = [
+  {
+    id: 'hermes',
+    name: '👑 Hermes',
+    role: 'Stratégia & Felügyelet',
+    emoji: '👑',
+    color: 1,
+    tasks: [
+      'Ütemezés ellenőrzése...',
+      'Cron feladatok felügyelete...',
+      'Memory szinkronizálás...',
+      'Telegram üzenetek feldolgozása...',
+      'n8n workflow status ellenőrzés...',
+      'Projekt állapotjelentés készítése...',
+    ]
+  },
+  {
+    id: 'clawdius',
+    name: '🦞 Clawdius',
+    role: 'Fővégrehajtó',
+    emoji: '🦞',
+    color: 2,
+    tasks: [
+      'Subagentek orchestralása...',
+      'Parancsok futtatása...',
+      'Kódgenerálás és review...',
+      'Tool management...',
+      'Fájlrendszer műveletek...',
+      'PDF dokumentum generálás...',
+    ]
+  },
+  {
+    id: 'chatbot-dev',
+    name: '🤖 Chatbot Dev',
+    role: 'Chatbot Fejlesztés',
+    emoji: '🤖',
+    color: 3,
+    tasks: [
+      'FLASK API endpointok fejlesztése...',
+      'Widget.js optimalizálás...',
+      'RAG pipeline tuning...',
+      'Tudásbázis frissítése...',
+      'Multi-language pattern ellenőrzés...',
+      'Új CSAAS sablon generálása...',
+    ]
+  },
+  {
+    id: 'web-scraper',
+    name: '🕷️ Web Scraper',
+    role: 'Adatgyűjtés',
+    emoji: '🕷️',
+    color: 4,
+    tasks: [
+      'Weboldalak letöltése...',
+      'raw_pages.json strukturálása...',
+      'Konkurens elemzés...',
+      'Adatkategorizálás...',
+      'Tudásbázis feltöltés...',
+      'Periodikus újrahúzás...',
+    ]
+  },
+  {
+    id: 'doc-gen',
+    name: '📄 Doc Gen',
+    role: 'Dokumentum Generálás',
+    emoji: '📄',
+    color: 5,
+    tasks: [
+      'Árajánlat PDF készítése...',
+      'Prezentáció generálás...',
+      'Szerződés sablon összeállítása...',
+      'Brand elemek alkalmazása...',
+      'Canvas design render...',
+      'Wkhtmltopdf konverzió...',
+    ]
+  },
+  {
+    id: 'contentus',
+    name: '🎨 Contentus',
+    role: 'Tartalomgyártás',
+    emoji: '🎨',
+    color: 6,
+    tasks: [
+      'Blog cikk írása...',
+      'Közösségi média poszt...',
+      'Hírlevél összeállítása...',
+      'Tutorial dokumentáció...',
+      'SEO optimalizálás...',
+      'Marketing anyagok...',
+    ]
+  },
+  {
+    id: 'analytics',
+    name: '📊 Analytics',
+    role: 'Elemzés & Riport',
+    emoji: '📊',
+    color: 7,
+    tasks: [
+      'Konverziók elemzése...',
+      'Ügyfél riport generálás...',
+      'Dashboard adatok frissítése...',
+      'Chatbot statisztikák...',
+      'Trendek vizualizálása...',
+      'Havi összefoglaló készítése...',
+    ]
+  },
+  {
+    id: 'onboarding',
+    name: '🧑‍💼 Onboarding',
+    role: 'Ügyfélbevezetés',
+    emoji: '🧑‍💼',
+    color: 8,
+    tasks: [
+      'Új ügyfél adatok felvétele...',
+      'Chatbot inicializálás...',
+      'Tudásbázis előkészítés...',
+      'Welcome csomag összeállítása...',
+      'Onboarding checklist...',
+      'Welcome email küldés...',
+    ]
+  }
+];
+
+// ===== DESK RENDER =====
+function renderDesks() {
+  const container = document.getElementById('desksContainer');
+  container.innerHTML = '';
+  AGENTS.forEach(agent => {
+    const desk = document.createElement('div');
+    desk.className = 'desk status-idle';
+    desk.id = 'desk-' + agent.id;
+
+    // Random initial task
+    const initialTask = agent.tasks[Math.floor(Math.random() * agent.tasks.length)];
+
+    desk.innerHTML = `
+      <div class="desk-status-bar"><div class="fill"></div></div>
+      <div class="desk-lamp">💡</div>
+      <div class="desk-monitor"><div class="screen-content"></div></div>
+      <div class="avatar-wrap">
+        <div class="avatar avatar-color-${agent.color}">${agent.emoji}</div>
+        <div class="avatar-ring"></div>
+      </div>
+      <div class="agent-name">${agent.name}</div>
+      <div class="agent-role">${agent.role}</div>
+      <div class="current-task" id="task-${agent.id}"><span class="thinking-dots">⏳</span></div>
+    `;
+    container.appendChild(desk);
+  });
+}
+
+// ===== STATUS SIMULATOR =====
+let taskCounters = {};
+AGENTS.forEach(a => { taskCounters[a.id] = 0; });
+
+const statuses = ['idle', 'working', 'thinking', 'done'];
+const activityVerbs = {
+  hermes: ['Stratégiai terv', 'Cron job', 'Memory', 'Telegram', 'Ütemezés'],
+  clawdius: ['Subagent', 'Kód', 'Tool', 'Fájl', 'PDF'],
+  'chatbot-dev': ['API', 'Widget', 'RAG', 'Knowledge base', 'Sablon'],
+  'web-scraper': ['Scrape', 'Struktúra', 'Elemzés', 'Kategória', 'Frissítés'],
+  'doc-gen': ['Árajánlat', 'Prezenter', 'Canvas', 'PDF render', 'Design'],
+  contentus: ['Blog', 'Social', 'Email', 'Dokumentáció', 'Tartalom'],
+  analytics: ['Konverzió', 'Riport', 'Dashboard', 'Stat', 'Trend'],
+  onboarding: ['Ügyfél', 'Chatbot setup', 'Tudásbázis', 'Welcome', 'Checklist'],
+};
+
+const activityEmojis = {
+  hermes: '👑', clawdius: '🦞', 'chatbot-dev': '🤖', 'web-scraper': '🕷️',
+  'doc-gen': '📄', contentus: '🎨', analytics: '📊', onboarding: '🧑‍💼'
+};
+
+function getRandomStatus(current) {
+  // Weighted random: more time working
+  const r = Math.random();
+  if (current === 'idle') return r < 0.7 ? 'working' : 'thinking';
+  if (current === 'working') return r < 0.2 ? 'done' : (r < 0.5 ? 'thinking' : 'working');
+  if (current === 'thinking') return r < 0.6 ? 'working' : (r < 0.8 ? 'done' : 'idle');
+  // done
+  return r < 0.6 ? 'idle' : 'working';
+}
+
+function updateAgent(agent) {
+  const desk = document.getElementById('desk-' + agent.id);
+  const taskEl = document.getElementById('task-' + agent.id);
+  if (!desk) return;
+
+  // Get current status
+  const currentStatus = desk.className.replace('desk ', '');
+  const newStatus = getRandomStatus(currentStatus);
+
+  // Update class
+  desk.className = 'desk status-' + newStatus;
+
+  // Update task text
+  let taskText = '';
+  switch (newStatus) {
+    case 'idle':
+      taskText = '💤 Pihenő mód';
+      break;
+    case 'working':
+      taskText = '⚡ ' + agent.tasks[Math.floor(Math.random() * agent.tasks.length)];
+      taskCounters[agent.id]++;
+      break;
+    case 'thinking':
+      taskText = '🤔 Elemzés...';
+      break;
+    case 'done':
+      const verbList = activityVerbs[agent.id] || ['Feladat'];
+      const verb = verbList[Math.floor(Math.random() * verbList.length)];
+      taskText = '✅ ' + verb + ' kész';
+      break;
+  }
+  taskEl.textContent = taskText;
+
+  // Log activity on status change
+  if (newStatus !== 'idle') {
+    logActivity(agent, newStatus, taskText);
+  }
+
+  // Update stats
+  updateStats();
+}
+
+function logActivity(agent, status, task) {
+  const list = document.getElementById('activityList');
+  const item = document.createElement('div');
+  item.className = 'activity-item';
+  const now = new Date();
+  const time = now.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const emoji = activityEmojis[agent.id] || '❓';
+  item.innerHTML = `<span class="time">${time}</span><span class="emoji">${emoji}</span> ${task}`;
+  list.prepend(item);
+
+  // Keep only last 20
+  while (list.children.length > 20) {
+    list.removeChild(list.lastChild);
+  }
+}
+
+function updateStats() {
+  const desks = document.querySelectorAll('.desk');
+  let online = 0, active = 0;
+  desks.forEach(d => {
+    if (d.className.includes('status-')) online++;
+    if (d.className.includes('status-working') || d.className.includes('status-thinking')) active++;
+  });
+  document.getElementById('statOnline').textContent = online;
+  document.getElementById('statActive').textContent = active;
+
+  const totalTasks = Object.values(taskCounters).reduce((a, b) => a + b, 0);
+  document.getElementById('statTasks').textContent = totalTasks;
+}
+
+// ===== CLOCK =====
+function updateClock() {
+  const now = new Date();
+  const time = now.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  document.getElementById('clock').textContent = time;
+}
+
+// ===== PARTICLES =====
+function createParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (15 + Math.random() * 25) + 's';
+    p.style.animationDelay = Math.random() * 20 + 's';
+    p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
+    container.appendChild(p);
+  }
+}
+
+// ===== INIT =====
+renderDesks();
+createParticles();
+updateClock();
+setInterval(updateClock, 1000);
+
+// Start simulation
+let startTime = Date.now();
+setInterval(() => {
+  const hours = Math.floor((Date.now() - startTime) / 3600000);
+  document.getElementById('statUptime').textContent = hours;
+}, 10000);
+
+// Update agents
+AGENTS.forEach((agent, i) => {
+  setTimeout(() => {
+    updateAgent(agent);
+    setInterval(() => updateAgent(agent), 4000 + Math.random() * 4000);
+  }, i * 800);
+});
+
+// Initial stats
+setTimeout(updateStats, 100);
+</script>
+</body>
+</html>
