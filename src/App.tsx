@@ -204,10 +204,24 @@ export default function App() {
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
   const [chatMsgs, setChatMsgs] = useState<{role:'user'|'assistant', content:string}[]>([])
+  const [chatUnread, setChatUnread] = useState(0)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   // Effect must be BEFORE conditional returns (React hooks rule)
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [chatMsgs])
+
+  // Listen for unread count updates from ChatPage
+  useEffect(() => {
+    const handler = (e: CustomEvent) => { if (e.detail?.count !== undefined) setChatUnread(e.detail.count) }
+    window.addEventListener('chat-unread' as any, handler as any)
+    // Check localStorage on mount
+    try { const v = localStorage.getItem('chat-unread'); if (v) setChatUnread(parseInt(v)) } catch {}
+    // Poll localStorage
+    const interval = setInterval(() => {
+      try { const v = localStorage.getItem('chat-unread'); if (v) setChatUnread(prev => parseInt(v) || prev) } catch {}
+    }, 2000)
+    return () => { window.removeEventListener('chat-unread' as any, handler as any); clearInterval(interval) }
+  }, [])
 
   // Error boundary
   if (error) return <div style={{padding:40,color:'#ef4444',background:'#0d0d0d',minHeight:'100vh'}}><h2>❌ Error</h2><pre style={{whiteSpace:'pre-wrap',marginTop:16,color:'#ccc',fontSize:13}}>{error}</pre><button onClick={() => {localStorage.clear();location.reload()}} style={{marginTop:16,padding:'8px 16px',background:'#ef4444',color:'#fff',border:'none',borderRadius:6,cursor:'pointer'}}>Reset & Reload</button></div>
@@ -274,7 +288,17 @@ export default function App() {
             <button className={`nav-tab ${tab==='monitor'?'active':''}`} onClick={() => setTab('monitor')}>🏆 COMMAND</button>
             <button className={`nav-tab ${tab==='tasks'?'active':''}`} onClick={() => setTab('tasks')}>📋 TASKS</button>
             <button className={`nav-tab ${tab==='projektek'?'active':''}`} onClick={() => setTab('projektek')}>📁 PROJEKTEK</button>
-            <button className={`nav-tab ${tab==='chat'?'active':''}`} onClick={() => setTab('chat')}>💬 CHAT</button>
+            <button className={`nav-tab ${tab==='chat'?'active':''}`} onClick={() => { setTab('chat'); setChatUnread(0); localStorage.setItem('chat-unread', '0') }} style={{position:'relative'}}>
+              💬 CHAT
+              {chatUnread > 0 && (
+                <span style={{
+                  position:'absolute', top:-2, right:-6,
+                  background:'#ef4444', color:'#fff', fontSize:9, fontWeight:700,
+                  borderRadius:10, padding:'1px 5px', lineHeight:1.3,
+                  boxShadow:'0 1px 3px rgba(0,0,0,0.4)',
+                }}>{chatUnread > 9 ? '9+' : chatUnread}</span>
+              )}
+            </button>
             <button className={`nav-tab ${tab==='finance'?'active':''}`} onClick={() => setTab('finance')}>💰 FINANCE</button>
             <button className={`nav-tab ${tab==='ideas'?'active':''}`} onClick={() => setTab('ideas')}>💡 IDEAS</button>
             <button className={`nav-tab ${tab==='youtube'?'active':''}`} onClick={() => setTab('youtube')}>🎬 YT</button>
