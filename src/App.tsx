@@ -7,6 +7,7 @@ import YouTubeSummariesPage from './pages/YouTubeSummariesPage'
 import CommandCenter from './pages/CommandCenter'
 import KanbanPage from './pages/KanbanPage'
 import KnowledgePage from './pages/KnowledgePage'
+import ChatPage from './pages/ChatPage'
 import LoginPage from './pages/LoginPage'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 
@@ -252,7 +253,7 @@ export default function App() {
       case 'monitor': return <CommandCenter />
       case 'tasks': return <KanbanPage />
       case 'projektek': return <ProjektekView />
-      case 'chat': return <ChatView input={chatInput} setInput={setChatInput} msgs={chatMsgs} loading={chatLoading} send={sendChat} bottomRef={bottomRef} />
+      case 'chat': return <ChatPage />
       case 'finance': return <FinanceView />
       case 'ideas': return <IdeasPage />
       case 'youtube': return <YouTubeSummariesPage />
