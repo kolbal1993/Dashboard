@@ -2,6 +2,11 @@ import React, { useState, useEffect, createContext, useContext, useRef, useCallb
 import type { Task, ChatMessage, AgentName } from './types'
 import { agents, defaultTasks, defaultChat, getAgent } from './data'
 import { SettingsPage } from './pages/SettingsPage'
+import IdeasPage from './pages/IdeasPage'
+import YouTubeSummariesPage from './pages/YouTubeSummariesPage'
+import CommandCenter from './pages/CommandCenter'
+import KanbanPage from './pages/KanbanPage'
+import KnowledgePage from './pages/KnowledgePage'
 import LoginPage from './pages/LoginPage'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 
@@ -14,7 +19,7 @@ interface ThemeState {
   setSelectedTask: (t: Task | null) => void
 }
 
-type Tab = 'monitor' | 'tasks' | 'projektek' | 'chat' | 'finance' | 'settings'
+type Tab = 'monitor' | 'tasks' | 'projektek' | 'chat' | 'finance' | 'ideas' | 'youtube' | 'knowledge' | 'settings'
 const Theme = createContext<ThemeState>(null!)
 export function useApp() { return useContext(Theme) }
 
@@ -190,6 +195,7 @@ const QUICK_SUGGESTIONS = [
 // ====== MAIN APP ======
 export default function App() {
   const { user, isLoggedIn, login, logout } = useAuth()
+  const [error, setError] = useState<string | null>(null)
   const [tasks, setTasks] = useState<Task[]>(defaultTasks)
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(defaultChat)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
@@ -199,9 +205,13 @@ export default function App() {
   const [chatMsgs, setChatMsgs] = useState<{role:'user'|'assistant', content:string}[]>([])
   const bottomRef = useRef<HTMLDivElement>(null)
 
-  if (!isLoggedIn) return <LoginPage onLogin={(email, pass) => login(email, pass)} />
-
+  // Effect must be BEFORE conditional returns (React hooks rule)
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [chatMsgs])
+
+  // Error boundary
+  if (error) return <div style={{padding:40,color:'#ef4444',background:'#0d0d0d',minHeight:'100vh'}}><h2>❌ Error</h2><pre style={{whiteSpace:'pre-wrap',marginTop:16,color:'#ccc',fontSize:13}}>{error}</pre><button onClick={() => {localStorage.clear();location.reload()}} style={{marginTop:16,padding:'8px 16px',background:'#ef4444',color:'#fff',border:'none',borderRadius:6,cursor:'pointer'}}>Reset & Reload</button></div>
+
+  if (!isLoggedIn) return <LoginPage onLogin={(email, pass) => login(email, pass)} />
 
   function addChat(msg: ChatMessage) { setChatMessages(prev => [...prev, msg]) }
   function handleAddComment(taskId: string, text: string) {
@@ -239,11 +249,14 @@ export default function App() {
 
   function renderContent() {
     switch (tab) {
-      case 'monitor': return <DashboardView tasks={tasks} chatMsgs={chatMsgs} />
-      case 'tasks': return <TasksView tasks={tasks} count={count} setSelectedTask={setSelectedTask} />
+      case 'monitor': return <CommandCenter />
+      case 'tasks': return <KanbanPage />
       case 'projektek': return <ProjektekView />
       case 'chat': return <ChatView input={chatInput} setInput={setChatInput} msgs={chatMsgs} loading={chatLoading} send={sendChat} bottomRef={bottomRef} />
       case 'finance': return <FinanceView />
+      case 'ideas': return <IdeasPage />
+      case 'youtube': return <YouTubeSummariesPage />
+      case 'knowledge': return <KnowledgePage />
       case 'settings': return <SettingsPage onTabChange={(t: string) => setTab(t as Tab)} />
     }
   }
@@ -257,11 +270,14 @@ export default function App() {
             <span className="nav-brand-text">Clawdius</span>
           </div>
           <div className="nav-tabs">
-            <button className={`nav-tab ${tab==='monitor'?'active':''}`} onClick={() => setTab('monitor')}>🖥️ MONITOR</button>
+            <button className={`nav-tab ${tab==='monitor'?'active':''}`} onClick={() => setTab('monitor')}>🏆 COMMAND</button>
             <button className={`nav-tab ${tab==='tasks'?'active':''}`} onClick={() => setTab('tasks')}>📋 TASKS</button>
             <button className={`nav-tab ${tab==='projektek'?'active':''}`} onClick={() => setTab('projektek')}>📁 PROJEKTEK</button>
             <button className={`nav-tab ${tab==='chat'?'active':''}`} onClick={() => setTab('chat')}>💬 CHAT</button>
             <button className={`nav-tab ${tab==='finance'?'active':''}`} onClick={() => setTab('finance')}>💰 FINANCE</button>
+            <button className={`nav-tab ${tab==='ideas'?'active':''}`} onClick={() => setTab('ideas')}>💡 IDEAS</button>
+            <button className={`nav-tab ${tab==='youtube'?'active':''}`} onClick={() => setTab('youtube')}>🎬 YT</button>
+            <button className={`nav-tab ${tab==='knowledge'?'active':''}`} onClick={() => setTab('knowledge')}>🧠 KNOWLEDGE</button>
             <button className={`nav-tab ${tab==='settings'?'active':''}`} onClick={() => setTab('settings')}>⚙️ SETTINGS</button>
           </div>
           <div className="nav-status">
@@ -283,7 +299,14 @@ export default function App() {
         </nav>
 
         <main className="main-content">
-          {renderContent()}
+          {(() => {
+            try {
+              return renderContent()
+            } catch(e: any) {
+              setError(String(e?.stack || e?.message || e))
+              return null
+            }
+          })()}
         </main>
 
         {selectedTask && (

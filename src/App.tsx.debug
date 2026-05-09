@@ -1,0 +1,5 @@
+// DEBUG: Trying to find what's broken
+// Let's check if component rendering itself breaks
+
+// First, let me check the basics
+console.log('DEBUG: App module loaded');

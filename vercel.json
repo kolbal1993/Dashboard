@@ -1,6 +1,9 @@
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/proxy" },
+    { "source": "/api/youtube/(.*)", "destination": "/api/youtube.js" },
+    { "source": "/ideas-api/(.*)", "destination": "/api/ideas-proxy.js" },
+    { "source": "/api/knowledge/(.*)", "destination": "/api/knowledge-proxy.js" },
+    { "source": "/api/predict/(.*)", "destination": "/api/predict-proxy.js" },
     { "source": "/mission-control", "destination": "/mission-control.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
