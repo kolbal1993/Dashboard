@@ -1,0 +1,29 @@
+#!/bin/bash
+# ============================================================
+# Clawdius Dashboard — Pre-Commit Hook
+# TypeScript type check commit előtt
+# ============================================================
+
+set -euo pipefail
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+echo ""
+echo "🧪 Clawdius Dashboard — Pre-Commit Check"
+echo "═══════════════════════════════════════════"
+
+# ── 1. tsc --noEmit ──
+echo -n "  🔍 TypeScript type check ... "
+if npx tsc --noEmit 2>&1; then
+    echo -e "${GREEN}PASS${NC}"
+else
+    echo -e "${RED}FAIL${NC}"
+    echo "  ⚠️  TypeScript hibák — javítsd és add újra"
+    exit 1
+fi
+
+echo ""
+echo -e "${GREEN}✅ Pre-Commit PASSED — commit engedélyezve${NC}"
+echo ""
