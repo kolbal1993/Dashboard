@@ -38,7 +38,13 @@ jobs:
         run: npx tsc --noEmit
         shell: bash
 
-      # ── 2. Build dry-run ──
+      # ── 2. ESLint ──
+      - name: ESLint
+        run: npx eslint src/ --max-warnings 0 2>/dev/null || npx eslint src/ --quiet
+        shell: bash
+        continue-on-error: true
+
+      # ── 3. Build dry-run ──
       - name: Build check
         run: npm run build
         env:
